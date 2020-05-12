@@ -1,0 +1,38 @@
+import requests
+from django.shortcuts import render
+from .models import City
+from .forms import CityForm
+
+# Create your views here.
+
+def weather(request):
+    
+    url = 'http://api.openweathermap.org/data/2.5/weather?q={}&units=metric&appid=f8891ee8faa11b19d3858ea09001a7c0'
+    
+    if request.method == 'POST':
+        req = request.POST
+        cityName = req["name"]
+        cityExist = City.objects.filter(name=cityName)
+        if len(cityExist) == 0:
+            form = CityForm(request.POST)
+            form.save()
+        
+
+    form = CityForm()
+
+    cities = City.objects.all()
+
+    weather_data = []
+
+    for city in cities:
+        r = requests.get(url.format(city)).json()
+        city_weather = {
+            'city': city.name,
+            'temperature': r['main']['temp'],
+            'description': r['weather'][0]['description'],
+            'icon': r['weather'][0]['icon']
+        } 
+        
+        weather_data.append(city_weather)
+    return render(request, 'weather.html', {'weather_data': weather_data, 'form': form})
+
