@@ -6,3 +6,5 @@ urlpatterns = [
     path('', include('weather_report.urls')),
     path('admin/', admin.site.urls),
 ]
+
+# new comments
